@@ -9,7 +9,7 @@ const ax = require('axios')
 exports.getUsers = async (req, res, next) => {
     try {
         const users = await User.find();
-        res
+        return res
             .status(200)
             .json({
                 message: 'Fetched Users Successfully!!',
@@ -24,8 +24,39 @@ exports.getUsers = async (req, res, next) => {
     }
 };
 
+//Fetching a single user
+exports.getUser = async (req, res, next) => {
+
+    //capturing the parameter from the url 
+    const userId = req.params.userId;
+
+    try {
+        const user = await User.findById(userId);
+        if (!user) {
+            return res
+                .status(404)
+                .json({
+                    message: 'User Not Found'
+                })
+        }
+        return res
+            .status(200)
+            .json({
+                message: 'User fetched!', user: user
+            });
+    }
+    catch (err) {
+        if (!err.statusCode) {
+            err.statusCode = 500;
+        }
+        next(err);
+    }
+};
+
 //User signUp
 exports.signUp = async (req, res, next) => {
+
+    //capturing validation errors
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res
@@ -34,9 +65,12 @@ exports.signUp = async (req, res, next) => {
                 message: errors.array()[0].msg
             })
     }
+
+    //getting data from the request body
     const name = req.body.name;
     const email = req.body.email;
     const password = req.body.password;
+    const role = req.body.role; // choosing role ,admin or user while signing up
     try {
         const exUser = await User.findOne({ email: email });
         if (exUser) {
@@ -46,18 +80,18 @@ exports.signUp = async (req, res, next) => {
                     message: 'User with this email-id exists. Take Please try with different email-id'
                 })
         }
-
+        //using bcryptjs package to create hashed password with 12 salt
         const hashedPw = await bcrypt.hash(password, 12);
         const user = new User({
             name: name,
             email: email,
             password: hashedPw,
-            role: 'user',
+            role: role,
             userAccess: true,
             fav: { books: [] }
         });
         await user.save();
-        res.
+        return res.
             status(201)
             .json({
                 message: 'User created successfully!',
@@ -76,6 +110,8 @@ exports.signUp = async (req, res, next) => {
 
 //Authorization
 exports.login = async (req, res, next) => {
+
+    //getting data from the request body
     const email = req.body.email;
     const password = req.body.password;
     let currentUser;
@@ -87,9 +123,9 @@ exports.login = async (req, res, next) => {
                 .json({
                     message: 'User with this email Not Found! Try signing up'
                 })
-
         }
         currentUser = user;
+        //comparing the hashed password and user entered password
         const isEqual = await bcrypt.compare(password, user.password);
         if (!isEqual) {
             return res
@@ -98,6 +134,7 @@ exports.login = async (req, res, next) => {
                     message: 'Password incorrect'
                 })
         }
+        //signing the token with the properties mentioned below 
         const token = jwt.sign(
             {
                 email: currentUser.email,
@@ -108,7 +145,7 @@ exports.login = async (req, res, next) => {
             'libapp005567',
             { expiresIn: '10h' }
         );
-        res
+        return res
             .status(200)
             .json({
                 token: token,
@@ -116,7 +153,8 @@ exports.login = async (req, res, next) => {
                 role: currentUser.role,
                 userAccess: currentUser.userAccess
             });
-    } catch (err) {
+    }
+    catch (err) {
         if (!err.statusCode) {
             err.statusCode = 500;
         }
@@ -124,34 +162,12 @@ exports.login = async (req, res, next) => {
     }
 };
 
-//Fetching a single user
-exports.getUser = async (req, res, next) => {
-    const userId = req.params.userId;
-    try {
-        const user = await User.findById(userId);
-        if (!user) {
-            return res
-                .status(404)
-                .json({
-                    message: 'User Not Found'
-                })
 
-        }
-        res
-            .status(200)
-            .json({
-                message: 'User fetched!', user: user
-            });
-    } catch (err) {
-        if (!err.statusCode) {
-            err.statusCode = 500;
-        }
-        next(err);
-    }
-};
 
 //Updating the user
 exports.updateUser = async (req, res, next) => {
+
+    //capturing validation errors
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         console.log(errors)
@@ -161,14 +177,18 @@ exports.updateUser = async (req, res, next) => {
                 message: errors.array()[0].msg
             })
     }
+
+    //capturing the parameter from the url 
     const userId = req.params.userId;
+
+    //getting data from the request body
     const name = req.body.name
     const password = req.body.password;
     const role = req.body.role;
     const userAccess = req.body.userAccess
-    // const fav = req.body.fav
-    try {
 
+    try {
+        //hashing the password with 12 salt
         const hashedPw = await bcrypt.hash(password, 12);
         const user = await User.findById(userId);
         if (!user) {
@@ -176,14 +196,14 @@ exports.updateUser = async (req, res, next) => {
                 .status(404)
                 .json({ message: 'User Not Found' })
         }
-        user.name = name;
 
+        //updating the user with inputs
+        user.name = name;
         user.password = hashedPw;
         user.role = role;
         user.userAccess = userAccess;
-        // user.fav = fav;
         const result = await user.save();
-        res
+        return res
             .status(200)
             .json({
                 message: 'User Info updated!', user: result
@@ -199,6 +219,8 @@ exports.updateUser = async (req, res, next) => {
 
 //User Deleting
 exports.deleteUser = async (req, res, next) => {
+
+    //capturing the parameter from the url 
     const userId = req.params.userId;
     try {
         const user = await User.findByIdAndRemove(userId);
@@ -227,21 +249,28 @@ exports.deleteUser = async (req, res, next) => {
 //fetching fav
 exports.getFav = async (req, res, next) => {
 
+    //finding the user by id in DB
     const user = await User.findById(req.userId);
     if (!user) {
         const error = new Error('Login First');
         error.statusCode = 422;
-        throw error;
+        next(error);
     }
+
+    //creating a string of bookid's in fav property
     let bookIdsToFetch = "";
-    user.fav.books=[];
+
+    //looping through the fav property of a user
     user.fav.books.forEach(book => {
         console.log(book)
         bookIdsToFetch += book.bookId + ',';
 
     })
+
+    //eliminating ',' if only one book is present in the fav property
     bookIdsToFetch = bookIdsToFetch.slice(0, -1)
     try {
+        //Authorization and authenticated
         if (bookIdsToFetch !== '') {
             const authHeader = req.get('Authorization');
             if (!authHeader) {
@@ -249,9 +278,12 @@ exports.getFav = async (req, res, next) => {
                 error.statusCode = 401;
                 throw error;
             }
+
+            //sending request to the book service along with the ids
             const fetchedBooks = await ax('http://localhost:3001/qbooks?id=' + bookIdsToFetch, {
                 headers: { Authorization: authHeader }
             })
+            //fetched books data from book service 
             console.log(fetchedBooks.data)
             return res.status(200).json({ message: 'Fetched Books fron book service', fetchedBooks: fetchedBooks.data.books })
         }
@@ -261,17 +293,29 @@ exports.getFav = async (req, res, next) => {
     }
     catch (err) {
         if (!err.statusCode) {
-            console.log(err)
             err.statusCode = 500;
         }
+        next(err);
     }
 };
 
 //adding book to fav
 exports.postFav = async (req, res, next) => {
+
+     //finding the user by id in DB
     const user = await User.findById(req.userId);
+    if (!user) {
+        const error = new Error('Login First');
+        error.statusCode = 422;
+        next(error);
+    }
+
+    //capturing the parameter from the url 
     const bookId = req.params.bookId;
+
     try {
+
+        //checking whether the bookid which is passed is already in fav
         const dupfavBook = user.fav.books.find(currentBook => {
             return currentBook.bookId.toString() === bookId.toString();
         })
@@ -284,7 +328,7 @@ exports.postFav = async (req, res, next) => {
                 })
         }
         else {
-            user.fav.books.push({ bookId: bookId })
+        user.fav.books.push({ bookId: bookId }) //pushing the bookid to fav property
             user.save().then(result => {
                 console.log(result)
             })
@@ -305,8 +349,19 @@ exports.postFav = async (req, res, next) => {
 
 //deleting book from fav
 exports.postFavDeleteBook = async (req, res, next) => {
+
+     //finding the user by id in DB
     const user = await User.findById(req.userId);
+    if (!user) {
+        const error = new Error('Login First');
+        error.statusCode = 422;
+        next(error);
+    }
+
+    //capturing the parameter from the url 
     const bookId = req.params.bookId;
+
+    //capturing the ids except for the id passed as the parameter and saving the remaining ids as fav
     const updatedFavBooks = user.fav.books.filter(item => {
         return item.bookId.toString() !== bookId.toString();
     });

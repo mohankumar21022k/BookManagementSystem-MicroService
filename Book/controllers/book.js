@@ -2,30 +2,8 @@ const Book = require('../models/book');
 const { validationResult } = require('express-validator');
 
 //Fetching books
-exports.queryedBooks = async (req, res, next) => {
-  let ids = req.query.id;
-  try{
-  if (ids) {
-    if (ids.trim()) {
-      ids = ids.split(',')
-      const book = await Book.find({ _id: ids });
-      return res.status(200).json({ message: "Books sent to the user services", books: book })
-    }
-  }
-  else {
-    return res.status(404).json({ message: 'Books not found' })
-  }
-}
-catch (err) {
-  if (!err.statusCode) {
-    err.statusCode = 500;
-  }
-  next(err);
-}
-};
-
 exports.getBooks = async (req, res, next) => {
-  //pagination
+
   const currentPage = req.query.page || 1;  //default page 1
   const perPage = 8;    //8 books per page
   try {
@@ -33,9 +11,19 @@ exports.getBooks = async (req, res, next) => {
       .find()
       .countDocuments();
     const books = await Book.find()
+
+      //pagination
       .skip((currentPage - 1) * perPage)
       .limit(perPage);
-    console.log(totalItems)
+
+    if (!books) {
+      return res
+        .status(404)
+        .json({
+          message: 'Books Not Found'
+        })
+    }
+
     return res
       .status(200)
       .json({
@@ -52,8 +40,38 @@ exports.getBooks = async (req, res, next) => {
   }
 };
 
+//Fetching info about single book
+exports.getBook = async (req, res, next) => {
+
+  const bookId = req.params.bookId;
+  try {
+    const book = await Book.findById(bookId);
+    if (!book) {
+      return res
+        .status(404)
+        .json({
+          message: 'Book Not Found'
+        })
+    }
+    return res
+      .status(200)
+      .json({
+        message: 'Book fetched!',
+        book: book
+      });
+  }
+  catch (err) {
+    if (!err.statusCode) {
+      err.statusCode = 500;
+    }
+    next(err);
+  }
+};
+
 //Creating book 
 exports.createBook = async (req, res, next) => {
+
+  //capturing validation errors
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res
@@ -62,7 +80,8 @@ exports.createBook = async (req, res, next) => {
         message: errors.array()[0].msg
       })
   }
-  const bookID = req.body.bookID;
+
+  //getting data from the request body
   const title = req.body.title;
   const authors = req.body.authors;
   const average_rating = req.body.average_rating;
@@ -74,9 +93,10 @@ exports.createBook = async (req, res, next) => {
   const text_reviews_count = req.body.text_reviews_count;
   const publication_date = req.body.publication_date;
   const publisher = req.body.publisher;
+
+  //creating book
   try {
     const book = new Book({
-      bookID: bookID,
       title: title,
       authors: authors,
       average_rating: average_rating,
@@ -92,11 +112,12 @@ exports.createBook = async (req, res, next) => {
 
     await book.save();
     const books = await Book.find();
-    res.status(201).json({
+    return res.status(201).json({
       message: 'Book Added successfully!',
       books: books
     });
-  } catch (err) {
+  }
+  catch (err) {
     if (!err.statusCode) {
       err.statusCode = 500;
     }
@@ -104,53 +125,14 @@ exports.createBook = async (req, res, next) => {
   }
 };
 
-//Getting info about single book
-exports.getBook = async (req, res, next) => {
-  const bookId = req.params.bookId;
-  try {
-    const book = await Book.findById(bookId);
-    if (!book) {
-      return res
-        .status(404)
-        .json({
-          message: 'Book Not Found'
-        })
-    }
-    res
-      .status(200)
-      .json({
-        message: 'Book fetched!',
-        book: book
-      });
-  } catch (err) {
-    if (!err.statusCode) {
-      err.statusCode = 500;
-    }
-    next(err);
-  }
-};
 
-//searching book
-exports.searchBook = async (req, res, next) => {
-  const filters = req.query.search;
-  const books = await Book.find({
-    "$or": [
-      { title: { $regex: filters, $options: 'i' } },
-      { authors: { $regex: filters, $options: 'i' } },
-      { isbn: { $regex: filters, $options: 'i' } },
-      // {publication_date:{$regex:filters}},
-      { publisher: { $regex: filters, $options: 'i' } }
-    ]
-  });
-  res
-    .status(200)
-    .json({
-      filteredBooks: books
-    });
-};
+
+
 
 //Updating the book info
 exports.updateBook = async (req, res, next) => {
+
+  //capturing validation errors
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res
@@ -160,7 +142,8 @@ exports.updateBook = async (req, res, next) => {
       })
   }
   const bookId = req.params.bookId;
-  const bookID = req.body.bookID
+
+  //getting data from the request body
   const title = req.body.title;
   const authors = req.body.authors;
   const average_rating = req.body.average_rating;
@@ -173,6 +156,7 @@ exports.updateBook = async (req, res, next) => {
   const publication_date = req.body.publication_date;
   const publisher = req.body.publisher;
 
+
   try {
     const book = await Book.findById(bookId);
     if (!book) {
@@ -182,7 +166,8 @@ exports.updateBook = async (req, res, next) => {
           message: 'Book Not Found'
         })
     }
-    book.bookID = bookID;
+
+    //updating the book
     book.title = title;
     book.authors = authors;
     book.average_rating = average_rating;
@@ -195,7 +180,7 @@ exports.updateBook = async (req, res, next) => {
     book.publication_date = publication_date;
     book.publisher = publisher;
     const result = await book.save();
-    res
+    return res
       .status(200)
       .json({
         message: 'Book updated!',
@@ -213,6 +198,7 @@ exports.updateBook = async (req, res, next) => {
 
 //Deleting Book from DB
 exports.deleteBook = async (req, res, next) => {
+  
   const bookId = req.params.bookId;
   try {
     const book = await Book.findByIdAndRemove(bookId);
@@ -223,7 +209,7 @@ exports.deleteBook = async (req, res, next) => {
           message: 'Book not found'
         });
     }
-    res
+    return res
       .status(201)
       .json({
         message: "Book deleted successfully!",
@@ -238,3 +224,55 @@ exports.deleteBook = async (req, res, next) => {
   }
 
 }
+
+//searching book
+exports.searchBook = async (req, res, next) => {
+
+  const filters = req.query.search;
+  //adding filters through query
+  try {
+    const books = await Book.find({
+      "$or": [
+        { title: { $regex: filters, $options: 'i' } },
+        { authors: { $regex: filters, $options: 'i' } },
+        { isbn: { $regex: filters, $options: 'i' } },
+        { publisher: { $regex: filters, $options: 'i' } }
+      ]
+    });
+    return res
+      .status(200)
+      .json({
+        filteredBooks: books
+      });
+  }
+  catch (err) {
+    if (!err.statusCode) {
+      err.statusCode = 500;
+    }
+    next(err);
+  }
+};
+
+//Sending favs
+exports.queryedBooks = async (req, res, next) => {
+  
+  let ids = req.query.id;
+  try {
+    if (ids) {
+      if (ids.trim()) {
+        ids = ids.split(',')
+        const book = await Book.find({ _id: ids });
+        return res.status(200).json({ message: "Books sent to the user services", books: book })
+      }
+    }
+    else {
+      return res.status(404).json({ message: 'Books not found' })
+    }
+  }
+  catch (err) {
+    if (!err.statusCode) {
+      err.statusCode = 500;
+    }
+    next(err);
+  }
+};

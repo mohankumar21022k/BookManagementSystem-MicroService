@@ -7,8 +7,7 @@ const dotenv = require('dotenv').config();
 const MONGODB_URI = `mongodb+srv://${process.env.MongoUser}:${process.env.MongoPass}@library.pblks.mongodb.net/${process.env.MongoDB}`;
 
 //registering routes
-
-const userRoute = require('./routes/users');
+const userRoute = require('../User/routes/users');
 
 //instance of express
 const app = express();
@@ -19,6 +18,7 @@ app.use(bodyParser.json());
 //routes using middleware
 app.use(userRoute);
 
+//unknown url access handling middleware
 app.use((req, res, next) => { res.status(404).json({ message: '404! Page Not Found' }) });
 
 //error handling middleware

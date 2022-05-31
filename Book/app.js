@@ -9,18 +9,17 @@ const MONGODB_URI = `mongodb+srv://${process.env.MongoUser}:${process.env.MongoP
 //registering routes
 const bookRoute = require('./routes/books');
 
-
 //instance of express
 const app = express();
 
 //parsing the request body to json 
 app.use(bodyParser.json());
-app.use(bookRoute);
-
-app.use((req, res, next) => { res.status(404).json({ message: '404! Page Not Found' }) });
 
 //routes using middleware
+app.use(bookRoute);
 
+//unknown url access handling middleware
+app.use((req, res, next) => { res.status(404).json({ message: '404! Page Not Found' }) });
 
 //error handling middleware
 app.use((error, req, res, next) => {
