@@ -1,4 +1,4 @@
-![alt text](https://miro.medium.com/max/800/1*cQAZ2YrXqmmrsKMFM4-oMw.jpeg "NodeExercise")
+![alt text](https://miro.medium.com/max/800/1*cQAZ2YrXqmmrsKMFM4-oMw.jpeg= 250x250 "NodeExercise")
 
 # BMS(Book Management System) 
 
