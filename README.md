@@ -35,7 +35,7 @@ Following tests libraries are used for unit/integration tests:
 * Mocha
 * Sinon
 * Chai
-Tests are kept next to source with following pattern *.spec.js
+
 Use following command to run tests:
 ```
 npm test
