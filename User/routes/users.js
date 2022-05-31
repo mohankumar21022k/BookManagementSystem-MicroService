@@ -4,6 +4,8 @@ const { body } = require('express-validator');
 const userController = require('../controllers/user');
 const auth = require('../middleware/authorize');
 const admin = require('../middleware/isAdmin');
+const userAccess = require('../middleware/userAccess');
+
 
 
 //fetching all users
@@ -31,10 +33,10 @@ router.post('/user/signup',
 router.post('/user/login', userController.login);
 
 //getting a particular user
-router.get('/user/:userId', auth,admin, userController.getUser);
+router.get('/user/:userId', auth, admin, userAccess, userController.getUser);
 
 //updating a particular user
-router.put('/user/:userId',auth,  admin,
+router.put('/user/:userId', auth, admin, userAccess,
     // [body('name')
     //     .trim()
     //     .isAlpha()
@@ -51,15 +53,15 @@ router.put('/user/:userId',auth,  admin,
     userController.updateUser);
 
 // //fetching favs
-router.get('/cuser/fav', auth, userController.getFav);
+router.get('/cuser/fav', auth, userAccess, userController.getFav);
 
 //posting favs
-router.post('/user/fav/:bookId', auth, userController.postFav);
+router.post('/user/fav/:bookId', auth, userAccess, userController.postFav);
 
 //deleting favs
-router.post('/user/fav-delete/:bookId', auth, userController.postFavDeleteBook);
+router.post('/user/fav-delete/:bookId', auth, userAccess, userController.postFavDeleteBook);
 
 //deleting a particular user
-router.delete('/user/:userId',auth, admin, userController.deleteUser);
+router.delete('/user/:userId', auth, admin, userAccess, userController.deleteUser);
 
 module.exports = router;

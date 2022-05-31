@@ -135,7 +135,6 @@ exports.getUser = async (req, res, next) => {
                 .json({
                     message: 'User Not Found'
                 })
-
         }
         res
             .status(200)
@@ -166,7 +165,7 @@ exports.updateUser = async (req, res, next) => {
     const password = req.body.password;
     const role = req.body.role;
     const userAccess = req.body.userAccess
-    // const fav = req.body.fav
+
     try {
 
         const hashedPw = await bcrypt.hash(password, 12);
@@ -177,11 +176,9 @@ exports.updateUser = async (req, res, next) => {
                 .json({ message: 'User Not Found' })
         }
         user.name = name;
-
         user.password = hashedPw;
         user.role = role;
         user.userAccess = userAccess;
-        // user.fav = fav;
         const result = await user.save();
         res
             .status(200)
@@ -231,10 +228,10 @@ exports.getFav = async (req, res, next) => {
     if (!user) {
         const error = new Error('Login First');
         error.statusCode = 422;
-        throw error;
+        next(error);
     }
     let bookIdsToFetch = "";
-    user.fav.books=[];
+
     user.fav.books.forEach(book => {
         console.log(book)
         bookIdsToFetch += book.bookId + ',';
@@ -261,15 +258,20 @@ exports.getFav = async (req, res, next) => {
     }
     catch (err) {
         if (!err.statusCode) {
-            console.log(err)
             err.statusCode = 500;
         }
+        next(err);
     }
 };
 
 //adding book to fav
 exports.postFav = async (req, res, next) => {
     const user = await User.findById(req.userId);
+    if (!user) {
+        const error = new Error('Login First');
+        error.statusCode = 422;
+        next(error);
+    }
     const bookId = req.params.bookId;
     try {
         const dupfavBook = user.fav.books.find(currentBook => {
@@ -306,6 +308,11 @@ exports.postFav = async (req, res, next) => {
 //deleting book from fav
 exports.postFavDeleteBook = async (req, res, next) => {
     const user = await User.findById(req.userId);
+    if (!user) {
+        const error = new Error('Login First');
+        error.statusCode = 422;
+        next(error);
+    }
     const bookId = req.params.bookId;
     const updatedFavBooks = user.fav.books.filter(item => {
         return item.bookId.toString() !== bookId.toString();

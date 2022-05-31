@@ -8,7 +8,7 @@ const MONGODB_URI = `mongodb+srv://${process.env.MongoUser}:${process.env.MongoP
 
 //registering routes
 
-const userRoute = require('./routes/users');
+const userRoute = require('../User/routes/users');
 
 //instance of express
 const app = express();
