@@ -25,13 +25,14 @@ const userSchema = new Schema({
     required: true
   },
 
-  // enable/disable
+  // enable:true/disable:false
   userAccess: {
     type: Boolean,
     required: true
   },
 
-  //favourite books
+  /*favourite books
+  fav is an object with books array ,which consists of bookId's as an object */
   fav: {
     books: [
       {

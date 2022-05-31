@@ -18,7 +18,7 @@ app.use(bodyParser.json());
 //routes using middleware
 app.use(bookRoute);
 
-//404
+//unknown url access handling middleware
 app.use((req, res, next) => { res.status(404).json({ message: '404! Page Not Found' }) });
 
 //error handling middleware

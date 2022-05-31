@@ -4,19 +4,36 @@ const { body } = require('express-validator');
 const bookController = require('../controllers/book');
 const auth = require('../middleware/authorize');
 const admin = require('../middleware/isAdmin');
-
+const userAccess = require('../middleware/userAccess')
 
 //fetching all books
-router.get('/books', bookController.getBooks);
+router.get('/books',
+
+    //action to be done by this route
+    bookController.getBooks);
 
 //querying route
-router.get('/qbooks', bookController.queryedBooks);
+router.get('/qbooks',
+
+    //action to be done by this route
+    bookController.queryedBooks);
 
 //search 
-router.get('/book', bookController.searchBook);
+router.get('/book',
+
+//authorization ,authentication as user/admin and also checks of the userAccess(i.e Enabled or Disabled)
+ auth,userAccess,
+
+    //action to be done by this route
+    bookController.searchBook);
 
 //creating book
-router.post('/book', auth, admin,
+router.post('/book',
+
+    //authorization ,authentication as admin and also checks of the userAccess(i.e Enabled or Disabled)
+    auth, admin,userAccess,
+
+    //validation 
     [body('isbn')
         .trim()
         .isLength({ min: 9 })
@@ -48,13 +65,25 @@ router.post('/book', auth, admin,
         .withMessage('Publisher must not be empty')
     ],
 
+    //action to be done by this route
     bookController.createBook);
 
 //getting a particular book
-router.get('/book/:bookId', auth, bookController.getBook);
+router.get('/book/:bookId',
+
+    //authorization ,authentication as user and also checks of the userAccess(i.e Enabled or Disabled)
+    auth, userAccess,
+
+    //action to be done by this route
+    bookController.getBook);
 
 //updating a particular book
-router.put('/book/:bookId', auth, admin,
+router.put('/book/:bookId',
+
+    //authorization ,authentication as admin and also checks of the userAccess(i.e Enabled or Disabled)
+    auth, admin,userAccess,
+
+    //validation
     [body('isbn')
         .trim()
         .isLength({ min: 9 }),
@@ -80,9 +109,16 @@ router.put('/book/:bookId', auth, admin,
         .withMessage('Publisher must not be empty')
     ],
 
+    //action to be done by this route
     bookController.updateBook);
 
 //deleting a particular book
-router.delete('/book/:bookId', auth, admin, bookController.deleteBook);
+router.delete('/book/:bookId',
+
+    //authorization ,authentication as admin and also checks of the userAccess(i.e Enabled or Disabled)
+    auth, admin,userAccess,
+
+    //action to be done by this route
+    bookController.deleteBook);
 
 module.exports = router;
