@@ -1,4 +1,4 @@
-![alt text](https://github.com/mohankumar21022k/BookManagementSystem-MicroService/nodejsexpressmongo.jpeg?raw=true "NodeExercise")
+![alt text](https://miro.medium.com/max/800/1*cQAZ2YrXqmmrsKMFM4-oMw.jpeg "NodeExercise")
 
 # BMS(Book Management System) 
 
