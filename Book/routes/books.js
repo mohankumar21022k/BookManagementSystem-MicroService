@@ -21,8 +21,8 @@ router.get('/qbooks',
 //search 
 router.get('/book',
 
-//authorization ,authentication as user/admin and also checks of the userAccess(i.e Enabled or Disabled)
- auth,userAccess,
+    //authorization ,authentication as user/admin and also checks of the userAccess(i.e Enabled or Disabled)
+    auth, userAccess,
 
     //action to be done by this route
     bookController.searchBook);
@@ -31,7 +31,7 @@ router.get('/book',
 router.post('/book',
 
     //authorization ,authentication as admin and also checks of the userAccess(i.e Enabled or Disabled)
-    auth, admin,userAccess,
+    auth, admin, userAccess,
 
     //validation 
     [body('isbn')
@@ -81,7 +81,7 @@ router.get('/book/:bookId',
 router.put('/book/:bookId',
 
     //authorization ,authentication as admin and also checks of the userAccess(i.e Enabled or Disabled)
-    auth, admin,userAccess,
+    auth, admin, userAccess,
 
     //validation
     [body('isbn')
@@ -116,7 +116,7 @@ router.put('/book/:bookId',
 router.delete('/book/:bookId',
 
     //authorization ,authentication as admin and also checks of the userAccess(i.e Enabled or Disabled)
-    auth, admin,userAccess,
+    auth, admin, userAccess,
 
     //action to be done by this route
     bookController.deleteBook);
