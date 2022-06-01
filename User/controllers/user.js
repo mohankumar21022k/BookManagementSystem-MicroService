@@ -97,7 +97,6 @@ exports.signUp = async (req, res, next) => {
                 message: 'User created successfully!',
                 user: user
             });
-
     }
     catch (err) {
         if (!err.statusCode) {
@@ -105,7 +104,6 @@ exports.signUp = async (req, res, next) => {
         }
         next(err);
     }
-
 };
 
 //Authorization

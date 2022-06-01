@@ -127,10 +127,6 @@ exports.createBook = async (req, res, next) => {
   }
 };
 
-
-
-
-
 //Updating the book info
 exports.updateBook = async (req, res, next) => {
 
@@ -159,7 +155,6 @@ exports.updateBook = async (req, res, next) => {
   const text_reviews_count = req.body.text_reviews_count;
   const publication_date = req.body.publication_date;
   const publisher = req.body.publisher;
-
 
   try {
     const book = await Book.findById(bookId);
@@ -198,7 +193,6 @@ exports.updateBook = async (req, res, next) => {
     next(err);
   }
 };
-
 
 //Deleting Book from DB
 exports.deleteBook = async (req, res, next) => {
