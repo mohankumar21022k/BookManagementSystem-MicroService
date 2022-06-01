@@ -272,6 +272,7 @@ exports.getFav = async (req, res, next) => {
     //eliminating ',' if only one book is present in the fav property
     bookIdsToFetch = bookIdsToFetch.slice(0, -1)
     try {
+        
         //Authorization and authenticated
         if (bookIdsToFetch !== '') {
             const authHeader = req.get('Authorization');
