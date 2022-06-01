@@ -153,16 +153,17 @@ exports.login = async (req, res, next) => {
                 role: currentUser.role,
                 userAccess: currentUser.userAccess
             });
+       
     }
     catch (err) {
         if (!err.statusCode) {
             err.statusCode = 500;
         }
         next(err);
+        return err;
     }
+
 };
-
-
 
 //Updating the user
 exports.updateUser = async (req, res, next) => {
@@ -302,7 +303,7 @@ exports.getFav = async (req, res, next) => {
 //adding book to fav
 exports.postFav = async (req, res, next) => {
 
-     //finding the user by id in DB
+    //finding the user by id in DB
     const user = await User.findById(req.userId);
     if (!user) {
         const error = new Error('Login First');
@@ -328,7 +329,7 @@ exports.postFav = async (req, res, next) => {
                 })
         }
         else {
-        user.fav.books.push({ bookId: bookId }) //pushing the bookid to fav property
+            user.fav.books.push({ bookId: bookId }) //pushing the bookid to fav property
             user.save().then(result => {
                 console.log(result)
             })
@@ -350,7 +351,7 @@ exports.postFav = async (req, res, next) => {
 //deleting book from fav
 exports.postFavDeleteBook = async (req, res, next) => {
 
-     //finding the user by id in DB
+    //finding the user by id in DB
     const user = await User.findById(req.userId);
     if (!user) {
         const error = new Error('Login First');
