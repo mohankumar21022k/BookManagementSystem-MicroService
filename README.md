@@ -7,7 +7,6 @@
 This repository contains a full configuration that runs NodeJS RESTful API Microservice
 
 # Requirements
-
 * NodeJS
 * MongoDB
 
@@ -16,13 +15,7 @@ You have to use the following command to install the necessary packages:
  ```
  npm install
  ```
-# Build for local development
-You have to use the following command to start a development server:
-```
-npm run dev
-```
-See package.json for more details.
-
+ 
 # Build for staging and production environments
 Use following command to build project:
 ```
@@ -44,3 +37,39 @@ Use following command to run tests:
 ```
 npm run test
 ```
+
+# Overview
+This repository consists of 2 folders namely:
+* Book 
+* User
+
+Which are the services accessing different databases.
+
+## Book
+Book service consists of:
+* controller - Has methods for CRUD operations on books ,to search book and also a
+method to send response to the request from user service(i.e sending favorite book data).
+* middleware - Which handles the authorization part by using JSON Web Token(JWT).
+* models - Models required
+* routes - Routes required
+* tests - Test cases
+* app.js - main script
+
+Some of the methods are authorized for only admins (for example: createBook ,updateBook ,deleteBook).
+This is achieved at route level.
+All the errors are handled by a separate middle in app.js file
+
+## User 
+User service consists of:
+* controller - Has methods for CRUD operations on users and methods related to mark and unmark a 
+book as favorite ,these methods are responsible for sending a request and handling the response
+by the book service.
+* middleware - Which handles the authorization part by using JSON Web Token(JWT).
+* models - Models required
+* routes - Routes required
+* tests - Test cases
+* app.js - main script
+
+Some of the methods are authorized for only admins (for example: updateUser ,deleteUser).
+This is achieved at route level.
+All the errors are handled by a separate middle in app.js file
