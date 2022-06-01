@@ -37,5 +37,5 @@ Following tests libraries are used for unit/integration tests:
 
 Use following command to run tests:
 ```
-npm test
+npm run test
 ```
