@@ -8,7 +8,6 @@ describe('User Controller', function () {
         it('Should throws an error with code 500 if accessing the database fails', function (done) {
             sinon.stub(User, 'findOne');
             User.findOne.throws();
-
             const req = {
                 body: {
                     email: 'test@test.com',
@@ -157,7 +156,4 @@ describe('User Controller', function () {
             User.findByIdAndRemove.restore();
         })
     });
-
-
-
 });

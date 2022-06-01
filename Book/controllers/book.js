@@ -43,7 +43,9 @@ exports.getBooks = async (req, res, next) => {
 //Fetching info about single book
 exports.getBook = async (req, res, next) => {
 
+  //capturing parameters from url
   const bookId = req.params.bookId;
+
   try {
     const book = await Book.findById(bookId);
     if (!book) {
@@ -141,6 +143,8 @@ exports.updateBook = async (req, res, next) => {
         message: errors.array()[0].msg
       })
   }
+
+  //capturing parameters from url
   const bookId = req.params.bookId;
 
   //getting data from the request body
@@ -198,8 +202,10 @@ exports.updateBook = async (req, res, next) => {
 
 //Deleting Book from DB
 exports.deleteBook = async (req, res, next) => {
-  
+
+  //capturing parameters from url
   const bookId = req.params.bookId;
+
   try {
     const book = await Book.findByIdAndRemove(bookId);
     if (!book) {
@@ -255,7 +261,7 @@ exports.searchBook = async (req, res, next) => {
 
 //Sending favs
 exports.queryedBooks = async (req, res, next) => {
-  
+
   let ids = req.query.id;
   try {
     if (ids) {

@@ -153,7 +153,7 @@ exports.login = async (req, res, next) => {
                 role: currentUser.role,
                 userAccess: currentUser.userAccess
             });
-       
+
     }
     catch (err) {
         if (!err.statusCode) {
@@ -223,16 +223,17 @@ exports.deleteUser = async (req, res, next) => {
 
     //capturing the parameter from the url 
     const userId = req.params.userId;
+
     try {
         const user = await User.findByIdAndRemove(userId);
         if (!user) {
             return res
                 .status(404)
                 .json({
-                    message: 'User not found '
+                    message: 'User not found'
                 });
         }
-        res
+        return res
             .status(201)
             .json({
                 message: "User deleted successfully!",
