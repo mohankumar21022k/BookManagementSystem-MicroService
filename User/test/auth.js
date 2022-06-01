@@ -66,4 +66,3 @@ describe('Authorize middleware', function() {
 });
 
 
-
