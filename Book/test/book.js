@@ -143,7 +143,6 @@ describe('Book Controller', function () {
             Book.find.throws();
             const req = {
                 body: {
-
                     title: 'title',
                     authors: 'authors',
                     publisher: 'publisher',
