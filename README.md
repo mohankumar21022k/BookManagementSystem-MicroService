@@ -11,6 +11,11 @@ This repository contains a full configuration that runs NodeJS RESTful API Micro
 * NodeJS
 * MongoDB
 
+# For installing the required packages
+You have to use the following command to install the necessary packages:
+ ```
+ npm install
+ ```
 # Build for local development
 You have to use the following command to start a development server:
 ```
@@ -37,5 +42,5 @@ Following tests libraries are used for unit/integration tests:
 
 Use following command to run tests:
 ```
-npm test
+npm run test
 ```
