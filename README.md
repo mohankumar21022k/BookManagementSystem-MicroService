@@ -2,7 +2,7 @@
   <img src="https://miro.medium.com/max/800/1*cQAZ2YrXqmmrsKMFM4-oMw.jpeg" width="670" title="NodeExerciset">
 </p>
 
-# BMS(Book Management System) 
+# LMS(Library Management System) 
 
 This repository contains a full configuration that runs NodeJS RESTful API Microservice
 
